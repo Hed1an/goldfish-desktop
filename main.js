@@ -6,7 +6,7 @@ const http = require('http');
 const path = require('path');
 const fs = require('fs');
 
-const PORT_START = 3080;
+const PORT_START = 3081;
 const PORT_TRIES = 10;
 
 let mainWindow = null;
@@ -257,7 +257,7 @@ app.whenReady().then(async () => {
   dshProcess = startDsh(serverPort);
   if (!dshProcess) { app.quit(); return; }
 
-  const up = await waitUp(serverPort, 150);
+  const up = await waitUp(serverPort, 300);
   if (!up) {
     dialog.showErrorBox('启动失败', 'DeepSeek Harness 服务未能就绪,请重试');
     app.quit();
