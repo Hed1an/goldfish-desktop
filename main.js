@@ -109,7 +109,7 @@ function createWindow(page) {
     minWidth: 1024,
     minHeight: 700,
     backgroundColor: '#0b0b0f',
-    title: 'DeepSeek Harness',
+    title: '黑金小鲸鱼',
     autoHideMenuBar: true,
     show: false,
     icon: path.join(appRoot(), 'assets', 'icon.png'),
