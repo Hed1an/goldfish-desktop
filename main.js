@@ -11,7 +11,6 @@ const PORT_TRIES = 10;
 
 let mainWindow = null;
 let dshProcess = null;
-let serverPort = null;
 let tray = null;
 let isQuitting = false;
 
@@ -96,9 +95,6 @@ function startDsh(port) {
   });
   child.on('exit', (code) => {
     console.log('[goldfish] dsh exited', code);
-    if (mainWindow && !mainWindow.isDestroyed()) {
-      mainWindow.webContents.send('dsh-exited', code);
-    }
   });
   return child;
 }
@@ -248,9 +244,9 @@ app.whenReady().then(async () => {
     } catch (e) { console.log('[goldfish] autostart register failed:', e.message); }
   }
 
-  serverPort = await pickPort();
+  const serverPort = await pickPort();
   if (serverPort === null) {
-    dialog.showErrorBox('启动失败', '找不到可用端口(3080-3089 均被占用)');
+    dialog.showErrorBox('启动失败', '找不到可用端口(3081-3090 均被占用)');
     app.quit();
     return;
   }

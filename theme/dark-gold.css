@@ -1,5 +1,5 @@
-/* DeepSeek Harness Desktop — 黑金主题 v2(圆角 + 主题变量 + 背景支持)
-   所有颜色走 CSS 变量(theme/panel.js 可切换/自定义),默认值即黑金 */
+/* DeepSeek Harness Desktop — 主题 v3(全局一体化)
+   所有颜色走 CSS 变量(theme/panel.js 可切换),无硬编码色,默认值即黑金 */
 
 :root {
   /* 颜色(默认黑金) */
@@ -8,13 +8,12 @@
   --dsh-bg-card: #16161d;
   --dsh-bg-hover: #1e1e26;
   --dsh-border: #2a2a33;
-  --dsh-gold: #d4af37;
-  --dsh-gold-soft: #b8932e;
-  --dsh-gold-bright: #f0d47c;
+  --dsh-accent: #d4af37;
+  --dsh-accent-soft: #b8932e;
+  --dsh-accent-bright: #f0d47c;
+  --dsh-accent-rgb: 212, 175, 55;
   --dsh-text: #e9e6df;
   --dsh-text-dim: #9a978f;
-  --dsh-accent: #d4af37;
-  --dsh-accent-bright: #f0d47c;
 
   /* 圆角 */
   --dsh-radius: 14px;
@@ -27,9 +26,12 @@
   --dsh-bg-overlay: rgba(5, 5, 8, 0.72);
 }
 
+html {
+  color-scheme: dark !important;
+}
+
 html, body {
   background-color: var(--dsh-bg) !important;
-  color-scheme: dark;
 }
 
 /* 自定义背景图 + 暗色遮罩 */
@@ -53,8 +55,7 @@ body, #app, .app, main, .main, [class*="layout"], [class*="shell"] {
   color: var(--dsh-text) !important;
 }
 
-/* ---- 圆角化 ---- */
-/* 侧边栏 / 面板 */
+/* ---- 侧边栏 / 面板 ---- */
 [class*="sidebar"], [class*="Sidebar"], [class*="panel"], [class*="Panel"],
 [class*="aside"], [class*="rail"], aside {
   background-color: var(--dsh-bg-soft) !important;
@@ -62,7 +63,7 @@ body, #app, .app, main, .main, [class*="layout"], [class*="shell"] {
   border-radius: var(--dsh-radius) !important;
 }
 
-/* 卡片 / 会话列表项 */
+/* ---- 卡片 / 会话列表项 ---- */
 [class*="card"], [class*="Card"], [class*="item"], [class*="Item"],
 [class*="row"], [class*="conversation"] {
   background-color: var(--dsh-bg-card) !important;
@@ -73,27 +74,26 @@ body, #app, .app, main, .main, [class*="layout"], [class*="shell"] {
 
 [class*="item"]:hover, [class*="Item"]:hover, [class*="row"]:hover {
   background-color: var(--dsh-bg-hover) !important;
-  border-color: var(--dsh-gold-soft) !important;
+  border-color: var(--dsh-accent-soft) !important;
   transform: translateY(-1px) !important;
 }
 
-/* 文字层级 */
+/* ---- 文字层级 ---- */
 [class*="title"], [class*="Title"], h1, h2, h3, h4 {
   color: var(--dsh-text) !important;
 }
-
 [class*="secondary"], [class*="muted"], [class*="Muted"], [class*="hint"],
 [class*="timestamp"], [class*="time"] {
   color: var(--dsh-text-dim) !important;
 }
 
-/* 链接 / 交互色 → 金 */
+/* ---- 链接 / 交互色 → 主题强调色 ---- */
 a, [class*="link"], [class*="Link"], [class*="accent"], [class*="Accent"],
-button[class*="primary"], [class*="primary"], [class*="active"] {
+[class*="primary"], [class*="active"] {
   color: var(--dsh-accent-bright) !important;
 }
 
-/* 按钮:圆角 + 悬停动效 */
+/* ---- 按钮 ---- */
 button {
   border-color: var(--dsh-border) !important;
   background-color: var(--dsh-bg-hover) !important;
@@ -102,26 +102,24 @@ button {
   transition: all 0.18s ease !important;
 }
 button:hover {
-  border-color: var(--dsh-gold-soft) !important;
+  border-color: var(--dsh-accent-soft) !important;
   color: var(--dsh-accent-bright) !important;
   transform: translateY(-1px) !important;
 }
-button:active {
-  transform: scale(0.97) !important;
-}
+button:active { transform: scale(0.97) !important; }
 button[class*="primary"] {
-  background-color: var(--dsh-gold-soft) !important;
-  border-color: var(--dsh-gold) !important;
-  color: #14100a !important;
+  background-color: var(--dsh-accent-soft) !important;
+  border-color: var(--dsh-accent) !important;
+  color: var(--dsh-bg) !important;
   border-radius: var(--dsh-radius-pill) !important;
-  box-shadow: 0 2px 14px rgba(212, 175, 55, 0.25) !important;
+  box-shadow: 0 2px 14px rgba(var(--dsh-accent-rgb), 0.25) !important;
 }
 button[class*="primary"]:hover {
-  background-color: var(--dsh-gold) !important;
-  box-shadow: 0 4px 20px rgba(212, 175, 55, 0.4) !important;
+  background-color: var(--dsh-accent) !important;
+  box-shadow: 0 4px 20px rgba(var(--dsh-accent-rgb), 0.4) !important;
 }
 
-/* 输入框:圆角 */
+/* ---- 输入框 ---- */
 input, textarea, select, [contenteditable="true"] {
   background-color: var(--dsh-bg-soft) !important;
   border-color: var(--dsh-border) !important;
@@ -130,44 +128,42 @@ input, textarea, select, [contenteditable="true"] {
   transition: border-color 0.18s ease, box-shadow 0.18s ease !important;
 }
 input:focus, textarea:focus, [contenteditable="true"]:focus {
-  border-color: var(--dsh-gold-soft) !important;
-  outline-color: var(--dsh-gold-soft) !important;
-  box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.15) !important;
+  border-color: var(--dsh-accent-soft) !important;
+  outline-color: var(--dsh-accent-soft) !important;
+  box-shadow: 0 0 0 3px rgba(var(--dsh-accent-rgb), 0.15) !important;
 }
 
-/* 消息气泡:大圆角 */
-[class*="message"], [class*="Message"], [class*="bubble"], [class*="Bubble"] {
+/* ---- 消息气泡 ---- */
+[class*="message"], [class*="Message"], [class*="bubble"], [class*="Bubble"],
+[class*="assistant"], [class*="Assistant"], [class*="user"], [class*="User"] {
   background-color: var(--dsh-bg-card) !important;
   border-color: var(--dsh-border) !important;
   border-radius: var(--dsh-radius) !important;
 }
-[class*="assistant"], [class*="Assistant"], [class*="user"], [class*="User"] {
-  background-color: var(--dsh-bg-card) !important;
-}
 
-/* 滚动条:圆角 */
+/* ---- 滚动条 ---- */
 ::-webkit-scrollbar { width: 10px; height: 10px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb {
-  background: #33333d;
+  background: var(--dsh-border);
   border-radius: var(--dsh-radius-pill);
   border: 2px solid transparent;
   background-clip: padding-box;
 }
-::-webkit-scrollbar-thumb:hover { background: var(--dsh-gold-soft); background-clip: padding-box; }
+::-webkit-scrollbar-thumb:hover { background: var(--dsh-accent-soft); background-clip: padding-box; }
 
-/* 选中文本 */
-::selection { background: rgba(212, 175, 55, 0.35); color: #fff; }
+/* ---- 选中文本 ---- */
+::selection { background: rgba(var(--dsh-accent-rgb), 0.35); color: #fff; }
 
-/* 代码块 */
+/* ---- 代码块 ---- */
 pre, code, [class*="code"] {
-  background-color: #101014 !important;
+  background-color: var(--dsh-bg-soft) !important;
   border-color: var(--dsh-border) !important;
-  color: #e6d9a8 !important;
+  color: var(--dsh-accent-bright) !important;
   border-radius: var(--dsh-radius-sm) !important;
 }
 
-/* 弹窗 / 浮层:大圆角 + 阴影 */
+/* ---- 弹窗 / 浮层 ---- */
 [class*="modal"], [class*="Modal"], [class*="dialog"], [class*="Dialog"],
 [class*="popover"], [class*="menu"] {
   background-color: var(--dsh-bg-card) !important;
@@ -176,12 +172,9 @@ pre, code, [class*="code"] {
   box-shadow: 0 12px 48px rgba(0, 0, 0, 0.5) !important;
 }
 
-/* 输入框占位符 */
 ::placeholder { color: var(--dsh-text-dim) !important; }
 
-/* ---- 全局图标 / Logo 颜色跟随主题(修复浅色模式下图标仍是深色) ---- */
-html { color-scheme: dark !important; }
-
+/* ---- 全局图标 / Logo 颜色跟随主题 ---- */
 [class*="sidebar"], [class*="Sidebar"], aside,
 [class*="header"], [class*="Header"],
 [class*="topbar"], [class*="Topbar"],
@@ -189,7 +182,6 @@ html { color-scheme: dark !important; }
 [class*="rail"], [class*="Rail"] {
   color: var(--dsh-text) !important;
 }
-/* Logo 用 currentColor,强制它继承主题文字色 */
 [class*="sidebar"] svg, [class*="Sidebar"] svg, aside svg,
 [class*="header"] svg, [class*="Header"] svg,
 [class*="logo"] *, [class*="Logo"] *,
@@ -198,22 +190,13 @@ svg[aria-hidden="true"] {
   fill: currentColor !important;
   stroke: currentColor !important;
 }
-/* 通用图标:继承所在文字色(配合上面的 color 继承) */
-[class*="icon"], [class*="Icon"] {
-  color: inherit !important;
-}
+[class*="icon"], [class*="Icon"] { color: inherit !important; }
 [class*="icon"] svg, [class*="Icon"] svg {
   color: inherit !important;
   fill: currentColor !important;
   stroke: currentColor !important;
 }
+a svg, [class*="link"] svg { fill: currentColor !important; }
 
-/* 表单控件在浅色系统下保持深色主题 */
-input, select, textarea, button, [role="button"] {
-  color-scheme: dark;
-}
-
-/* 链接图标跟随强调色 */
-a svg, [class*="link"] svg {
-  fill: currentColor !important;
-}
+/* ---- 表单控件在浅色系统下保持深色主题 ---- */
+input, select, textarea, button, [role="button"] { color-scheme: dark; }

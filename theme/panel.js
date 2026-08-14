@@ -13,9 +13,9 @@
       vars: {
         '--dsh-bg': '#0b0b0f', '--dsh-bg-soft': '#141419', '--dsh-bg-card': '#16161d',
         '--dsh-bg-hover': '#1e1e26', '--dsh-border': '#2a2a33',
-        '--dsh-gold': '#d4af37', '--dsh-gold-soft': '#b8932e', '--dsh-gold-bright': '#f0d47c',
+        '--dsh-accent': '#d4af37', '--dsh-accent-soft': '#b8932e', '--dsh-accent-bright': '#f0d47c',
+        '--dsh-accent-rgb': '212, 175, 55',
         '--dsh-text': '#e9e6df', '--dsh-text-dim': '#9a978f',
-        '--dsh-accent': '#d4af37', '--dsh-accent-bright': '#f0d47c',
       },
     },
     blue: {
@@ -23,9 +23,9 @@
       vars: {
         '--dsh-bg': '#0a0e1a', '--dsh-bg-soft': '#101627', '--dsh-bg-card': '#131a2e',
         '--dsh-bg-hover': '#1a2340', '--dsh-border': '#232f4d',
-        '--dsh-gold': '#4d7cfe', '--dsh-gold-soft': '#3a63d8', '--dsh-gold-bright': '#8fb0ff',
+        '--dsh-accent': '#4d7cfe', '--dsh-accent-soft': '#3a63d8', '--dsh-accent-bright': '#8fb0ff',
+        '--dsh-accent-rgb': '77, 124, 254',
         '--dsh-text': '#e6ecf7', '--dsh-text-dim': '#8b96ad',
-        '--dsh-accent': '#4d7cfe', '--dsh-accent-bright': '#8fb0ff',
       },
     },
     green: {
@@ -33,9 +33,9 @@
       vars: {
         '--dsh-bg': '#07110d', '--dsh-bg-soft': '#0d1a14', '--dsh-bg-card': '#102019',
         '--dsh-bg-hover': '#162a20', '--dsh-border': '#1e3a2c',
-        '--dsh-gold': '#2fd37f', '--dsh-gold-soft': '#24ab66', '--dsh-gold-bright': '#7cebb2',
+        '--dsh-accent': '#2fd37f', '--dsh-accent-soft': '#24ab66', '--dsh-accent-bright': '#7cebb2',
+        '--dsh-accent-rgb': '47, 211, 127',
         '--dsh-text': '#e2f3e9', '--dsh-text-dim': '#8aaa99',
-        '--dsh-accent': '#2fd37f', '--dsh-accent-bright': '#7cebb2',
       },
     },
     rose: {
@@ -43,9 +43,9 @@
       vars: {
         '--dsh-bg': '#140a0c', '--dsh-bg-soft': '#1d1013', '--dsh-bg-card': '#231418',
         '--dsh-bg-hover': '#2e1a20', '--dsh-border': '#40242c',
-        '--dsh-gold': '#ff5f7e', '--dsh-gold-soft': '#d84a66', '--dsh-gold-bright': '#ff9db0',
+        '--dsh-accent': '#ff5f7e', '--dsh-accent-soft': '#d84a66', '--dsh-accent-bright': '#ff9db0',
+        '--dsh-accent-rgb': '255, 95, 126',
         '--dsh-text': '#f8e8ea', '--dsh-text-dim': '#b08e96',
-        '--dsh-accent': '#ff5f7e', '--dsh-accent-bright': '#ff9db0',
       },
     },
     purple: {
@@ -53,9 +53,9 @@
       vars: {
         '--dsh-bg': '#0e0a18', '--dsh-bg-soft': '#171026', '--dsh-bg-card': '#1b1330',
         '--dsh-bg-hover': '#241a40', '--dsh-border': '#312653',
-        '--dsh-gold': '#a78bfa', '--dsh-gold-soft': '#8b6ef0', '--dsh-gold-bright': '#cdbaff',
+        '--dsh-accent': '#a78bfa', '--dsh-accent-soft': '#8b6ef0', '--dsh-accent-bright': '#cdbaff',
+        '--dsh-accent-rgb': '167, 139, 250',
         '--dsh-text': '#ece8fa', '--dsh-text-dim': '#9d92bd',
-        '--dsh-accent': '#a78bfa', '--dsh-accent-bright': '#cdbaff',
       },
     },
     mono: {
@@ -63,9 +63,9 @@
       vars: {
         '--dsh-bg': '#0a0a0a', '--dsh-bg-soft': '#111111', '--dsh-bg-card': '#141414',
         '--dsh-bg-hover': '#1c1c1c', '--dsh-border': '#262626',
-        '--dsh-gold': '#e8e8e8', '--dsh-gold-soft': '#c4c4c4', '--dsh-gold-bright': '#ffffff',
+        '--dsh-accent': '#e8e8e8', '--dsh-accent-soft': '#c4c4c4', '--dsh-accent-bright': '#ffffff',
+        '--dsh-accent-rgb': '232, 232, 232',
         '--dsh-text': '#f2f2f2', '--dsh-text-dim': '#8f8f8f',
-        '--dsh-accent': '#e8e8e8', '--dsh-accent-bright': '#ffffff',
       },
     },
   };
