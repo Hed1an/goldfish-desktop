@@ -1,0 +1,129 @@
+/* DeepSeek Harness Desktop — 黑金主题
+   覆盖 dsh Web UI 默认配色:深黑底 + 金色点缀
+   选择器宽泛但谨慎:只覆盖颜色/边框,不破坏布局 */
+
+:root {
+  --dsh-bg: #0b0b0f;
+  --dsh-bg-soft: #141419;
+  --dsh-bg-card: #16161d;
+  --dsh-bg-hover: #1e1e26;
+  --dsh-border: #2a2a33;
+  --dsh-gold: #d4af37;
+  --dsh-gold-soft: #b8932e;
+  --dsh-gold-bright: #f0d47c;
+  --dsh-text: #e9e6df;
+  --dsh-text-dim: #9a978f;
+}
+
+html, body {
+  background-color: var(--dsh-bg) !important;
+  color-scheme: dark;
+}
+
+body, #app, .app, main, .main, [class*="layout"], [class*="shell"] {
+  background-color: var(--dsh-bg) !important;
+  color: var(--dsh-text) !important;
+}
+
+/* 侧边栏 / 面板 */
+[class*="sidebar"], [class*="Sidebar"], [class*="panel"], [class*="Panel"],
+[class*="aside"], [class*="rail"], aside {
+  background-color: var(--dsh-bg-soft) !important;
+  border-color: var(--dsh-border) !important;
+}
+
+/* 卡片 / 会话列表项 */
+[class*="card"], [class*="Card"], [class*="item"], [class*="Item"],
+[class*="row"], [class*="conversation"] {
+  background-color: var(--dsh-bg-card) !important;
+  border-color: var(--dsh-border) !important;
+}
+
+[class*="item"]:hover, [class*="Item"]:hover, [class*="row"]:hover {
+  background-color: var(--dsh-bg-hover) !important;
+}
+
+/* 文字层级 */
+[class*="title"], [class*="Title"], h1, h2, h3, h4 {
+  color: var(--dsh-text) !important;
+}
+
+[class*="secondary"], [class*="muted"], [class*="Muted"], [class*="hint"],
+[class*="timestamp"], [class*="time"] {
+  color: var(--dsh-text-dim) !important;
+}
+
+/* 链接 / 交互色 → 金 */
+a, [class*="link"], [class*="Link"], [class*="accent"], [class*="Accent"],
+button[class*="primary"], [class*="primary"], [class*="active"] {
+  color: var(--dsh-gold-bright) !important;
+}
+
+/* 按钮 */
+button {
+  border-color: var(--dsh-border) !important;
+  background-color: var(--dsh-bg-hover) !important;
+  color: var(--dsh-text) !important;
+}
+button:hover {
+  border-color: var(--dsh-gold-soft) !important;
+  color: var(--dsh-gold-bright) !important;
+}
+button[class*="primary"] {
+  background-color: var(--dsh-gold-soft) !important;
+  border-color: var(--dsh-gold) !important;
+  color: #14100a !important;
+}
+button[class*="primary"]:hover {
+  background-color: var(--dsh-gold) !important;
+}
+
+/* 输入框 */
+input, textarea, select, [contenteditable="true"] {
+  background-color: var(--dsh-bg-soft) !important;
+  border-color: var(--dsh-border) !important;
+  color: var(--dsh-text) !important;
+}
+input:focus, textarea:focus, [contenteditable="true"]:focus {
+  border-color: var(--dsh-gold-soft) !important;
+  outline-color: var(--dsh-gold-soft) !important;
+}
+
+/* 消息气泡 */
+[class*="message"], [class*="Message"], [class*="bubble"], [class*="Bubble"] {
+  background-color: var(--dsh-bg-card) !important;
+  border-color: var(--dsh-border) !important;
+}
+[class*="assistant"], [class*="Assistant"], [class*="user"], [class*="User"] {
+  background-color: var(--dsh-bg-card) !important;
+}
+
+/* 滚动条 */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: var(--dsh-bg); }
+::-webkit-scrollbar-thumb {
+  background: #33333d;
+  border-radius: 5px;
+  border: 2px solid var(--dsh-bg);
+}
+::-webkit-scrollbar-thumb:hover { background: var(--dsh-gold-soft); }
+
+/* 选中文本 */
+::selection { background: rgba(212, 175, 55, 0.35); color: #fff; }
+
+/* 代码块 */
+pre, code, [class*="code"] {
+  background-color: #101014 !important;
+  border-color: var(--dsh-border) !important;
+  color: #e6d9a8 !important;
+}
+
+/* 弹窗 / 浮层 */
+[class*="modal"], [class*="Modal"], [class*="dialog"], [class*="Dialog"],
+[class*="popover"], [class*="menu"] {
+  background-color: var(--dsh-bg-card) !important;
+  border-color: var(--dsh-border) !important;
+}
+
+/* 输入框占位符 */
+::placeholder { color: var(--dsh-text-dim) !important; }
