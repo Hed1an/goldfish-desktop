@@ -1,8 +1,8 @@
-/* DeepSeek Harness Desktop — 黑金主题
-   覆盖 dsh Web UI 默认配色:深黑底 + 金色点缀
-   选择器宽泛但谨慎:只覆盖颜色/边框,不破坏布局 */
+/* DeepSeek Harness Desktop — 黑金主题 v2(圆角 + 主题变量 + 背景支持)
+   所有颜色走 CSS 变量(theme/panel.js 可切换/自定义),默认值即黑金 */
 
 :root {
+  /* 颜色(默认黑金) */
   --dsh-bg: #0b0b0f;
   --dsh-bg-soft: #141419;
   --dsh-bg-card: #16161d;
@@ -13,6 +13,18 @@
   --dsh-gold-bright: #f0d47c;
   --dsh-text: #e9e6df;
   --dsh-text-dim: #9a978f;
+  --dsh-accent: #d4af37;
+  --dsh-accent-bright: #f0d47c;
+
+  /* 圆角 */
+  --dsh-radius: 14px;
+  --dsh-radius-sm: 10px;
+  --dsh-radius-xs: 8px;
+  --dsh-radius-pill: 999px;
+
+  /* 自定义背景图(panel.js 设置) */
+  --dsh-bg-image: none;
+  --dsh-bg-overlay: rgba(5, 5, 8, 0.72);
 }
 
 html, body {
@@ -20,16 +32,34 @@ html, body {
   color-scheme: dark;
 }
 
+/* 自定义背景图 + 暗色遮罩 */
+body {
+  background-image: var(--dsh-bg-image) !important;
+  background-size: cover !important;
+  background-position: center !important;
+  background-attachment: fixed !important;
+}
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: var(--dsh-bg-overlay);
+  pointer-events: none;
+  z-index: 0;
+}
+
 body, #app, .app, main, .main, [class*="layout"], [class*="shell"] {
-  background-color: var(--dsh-bg) !important;
+  background-color: transparent !important;
   color: var(--dsh-text) !important;
 }
 
+/* ---- 圆角化 ---- */
 /* 侧边栏 / 面板 */
 [class*="sidebar"], [class*="Sidebar"], [class*="panel"], [class*="Panel"],
 [class*="aside"], [class*="rail"], aside {
   background-color: var(--dsh-bg-soft) !important;
   border-color: var(--dsh-border) !important;
+  border-radius: var(--dsh-radius) !important;
 }
 
 /* 卡片 / 会话列表项 */
@@ -37,10 +67,14 @@ body, #app, .app, main, .main, [class*="layout"], [class*="shell"] {
 [class*="row"], [class*="conversation"] {
   background-color: var(--dsh-bg-card) !important;
   border-color: var(--dsh-border) !important;
+  border-radius: var(--dsh-radius) !important;
+  transition: background-color 0.18s ease, border-color 0.18s ease, transform 0.12s ease !important;
 }
 
 [class*="item"]:hover, [class*="Item"]:hover, [class*="row"]:hover {
   background-color: var(--dsh-bg-hover) !important;
+  border-color: var(--dsh-gold-soft) !important;
+  transform: translateY(-1px) !important;
 }
 
 /* 文字层级 */
@@ -56,57 +90,71 @@ body, #app, .app, main, .main, [class*="layout"], [class*="shell"] {
 /* 链接 / 交互色 → 金 */
 a, [class*="link"], [class*="Link"], [class*="accent"], [class*="Accent"],
 button[class*="primary"], [class*="primary"], [class*="active"] {
-  color: var(--dsh-gold-bright) !important;
+  color: var(--dsh-accent-bright) !important;
 }
 
-/* 按钮 */
+/* 按钮:圆角 + 悬停动效 */
 button {
   border-color: var(--dsh-border) !important;
   background-color: var(--dsh-bg-hover) !important;
   color: var(--dsh-text) !important;
+  border-radius: var(--dsh-radius-sm) !important;
+  transition: all 0.18s ease !important;
 }
 button:hover {
   border-color: var(--dsh-gold-soft) !important;
-  color: var(--dsh-gold-bright) !important;
+  color: var(--dsh-accent-bright) !important;
+  transform: translateY(-1px) !important;
+}
+button:active {
+  transform: scale(0.97) !important;
 }
 button[class*="primary"] {
   background-color: var(--dsh-gold-soft) !important;
   border-color: var(--dsh-gold) !important;
   color: #14100a !important;
+  border-radius: var(--dsh-radius-pill) !important;
+  box-shadow: 0 2px 14px rgba(212, 175, 55, 0.25) !important;
 }
 button[class*="primary"]:hover {
   background-color: var(--dsh-gold) !important;
+  box-shadow: 0 4px 20px rgba(212, 175, 55, 0.4) !important;
 }
 
-/* 输入框 */
+/* 输入框:圆角 */
 input, textarea, select, [contenteditable="true"] {
   background-color: var(--dsh-bg-soft) !important;
   border-color: var(--dsh-border) !important;
   color: var(--dsh-text) !important;
+  border-radius: var(--dsh-radius-sm) !important;
+  transition: border-color 0.18s ease, box-shadow 0.18s ease !important;
 }
 input:focus, textarea:focus, [contenteditable="true"]:focus {
   border-color: var(--dsh-gold-soft) !important;
   outline-color: var(--dsh-gold-soft) !important;
+  box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.15) !important;
 }
 
-/* 消息气泡 */
+/* 消息气泡:大圆角 */
 [class*="message"], [class*="Message"], [class*="bubble"], [class*="Bubble"] {
   background-color: var(--dsh-bg-card) !important;
   border-color: var(--dsh-border) !important;
+  border-radius: var(--dsh-radius) !important;
 }
 [class*="assistant"], [class*="Assistant"], [class*="user"], [class*="User"] {
   background-color: var(--dsh-bg-card) !important;
 }
 
-/* 滚动条 */
+/* 滚动条:圆角 */
 ::-webkit-scrollbar { width: 10px; height: 10px; }
-::-webkit-scrollbar-track { background: var(--dsh-bg); }
+::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb {
   background: #33333d;
-  border-radius: 5px;
-  border: 2px solid var(--dsh-bg);
+  border-radius: var(--dsh-radius-pill);
+  border: 2px solid transparent;
+  background-clip: padding-box;
 }
-::-webkit-scrollbar-thumb:hover { background: var(--dsh-gold-soft); }
+::-webkit-scrollbar-thumb:hover { background: var(--dsh-gold-soft); background-clip: padding-box; }
 
 /* 选中文本 */
 ::selection { background: rgba(212, 175, 55, 0.35); color: #fff; }
@@ -116,13 +164,16 @@ pre, code, [class*="code"] {
   background-color: #101014 !important;
   border-color: var(--dsh-border) !important;
   color: #e6d9a8 !important;
+  border-radius: var(--dsh-radius-sm) !important;
 }
 
-/* 弹窗 / 浮层 */
+/* 弹窗 / 浮层:大圆角 + 阴影 */
 [class*="modal"], [class*="Modal"], [class*="dialog"], [class*="Dialog"],
 [class*="popover"], [class*="menu"] {
   background-color: var(--dsh-bg-card) !important;
   border-color: var(--dsh-border) !important;
+  border-radius: var(--dsh-radius) !important;
+  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.5) !important;
 }
 
 /* 输入框占位符 */

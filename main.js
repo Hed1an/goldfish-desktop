@@ -1,6 +1,6 @@
 // DeepSeek Harness Desktop — 主进程
-// 内嵌启动 dsh Web UI(Electron 的 Node 直接跑 dsh),独立窗口呈现
-const { app, BrowserWindow, dialog } = require('electron');
+// 内嵌启动 dsh Web UI(内置 Node 运行时),独立窗口呈现 + 黑金主题
+const { app, BrowserWindow, dialog, ipcMain } = require('electron');
 const { spawn } = require('child_process');
 const http = require('http');
 const path = require('path');
@@ -12,6 +12,17 @@ const PORT_TRIES = 10;
 let mainWindow = null;
 let dshProcess = null;
 let serverPort = null;
+
+// ---- 主题持久化(userData/themes.json,不受端口变化影响) ----
+function themeFile() {
+  return path.join(app.getPath('userData'), 'themes.json');
+}
+ipcMain.handle('theme:get', () => {
+  try { return fs.readFileSync(themeFile(), 'utf8'); } catch { return null; }
+});
+ipcMain.handle('theme:set', (_e, value) => {
+  try { fs.writeFileSync(themeFile(), String(value)); return true; } catch { return false; }
+});
 
 // ---- 单实例:再点快捷方式时聚焦已有窗口 ----
 const gotLock = app.requestSingleInstanceLock();
@@ -100,6 +111,7 @@ function createWindow(url) {
       contextIsolation: true,
       nodeIntegration: false,
       sandbox: true,
+      preload: path.join(appRoot(), 'preload.js'),
     },
   });
 
@@ -107,6 +119,10 @@ function createWindow(url) {
     const css = path.join(appRoot(), 'theme', 'dark-gold.css');
     if (fs.existsSync(css)) {
       mainWindow.webContents.insertCSS(fs.readFileSync(css, 'utf8')).catch(() => {});
+    }
+    const panel = path.join(appRoot(), 'theme', 'panel.js');
+    if (fs.existsSync(panel)) {
+      mainWindow.webContents.executeJavaScript(fs.readFileSync(panel, 'utf8')).catch(() => {});
     }
   });
 
