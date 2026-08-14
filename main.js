@@ -1,6 +1,6 @@
 // DeepSeek Harness Desktop — 主进程
 // 内嵌启动 dsh Web UI(内置 Node 运行时),独立窗口呈现 + 黑金主题
-const { app, BrowserWindow, dialog, ipcMain } = require('electron');
+const { app, BrowserWindow, dialog, ipcMain, Tray, Menu, nativeImage } = require('electron');
 const { spawn } = require('child_process');
 const http = require('http');
 const path = require('path');
@@ -12,10 +12,14 @@ const PORT_TRIES = 10;
 let mainWindow = null;
 let dshProcess = null;
 let serverPort = null;
+let tray = null;
+let isQuitting = false;
 
 // ---- 无头检查更新模式:--check-update ----
 // 由计划任务每天 8:00 / 20:00 调用;发现新版则静默下载安装后退出
 const HEADLESS_CHECK = process.argv.includes('--check-update');
+// ---- 开机静默启动:--hidden(托盘运行,不弹窗,等待用户点击) ----
+const HIDDEN_START = process.argv.includes('--hidden');
 
 // ---- 主题持久化(userData/themes.json,不受端口变化影响) ----
 function themeFile() {
@@ -35,10 +39,7 @@ if (!gotLock) {
   app.quit();
 } else {
   app.on('second-instance', () => {
-    if (mainWindow) {
-      if (mainWindow.isMinimized()) mainWindow.restore();
-      mainWindow.focus();
-    }
+    showMainWindow();
   });
 }
 
@@ -121,7 +122,10 @@ function createWindow(page) {
     },
   });
 
-  mainWindow.once('ready-to-show', () => mainWindow.show());
+  mainWindow.once('ready-to-show', () => {
+    // 开机静默(--hidden)不自动弹窗,等用户点托盘/图标;否则立即显示
+    if (!HIDDEN_START) mainWindow.show();
+  });
 
   mainWindow.webContents.on('did-finish-load', () => {
     // 仅在加载真实 UI(http://127.0.0.1)时注入主题与工具;splash 页跳过
@@ -140,7 +144,38 @@ function createWindow(page) {
   mainWindow.webContents.setWindowOpenHandler(() => ({ action: 'deny' }));
   if (page.startsWith('http')) mainWindow.loadURL(page);
   else mainWindow.loadFile(page);
+  // 关闭窗口 → 隐藏到托盘(驻留常驻,dsh 服务保持运行,再点秒开)
+  mainWindow.on('close', (e) => {
+    if (!isQuitting) {
+      e.preventDefault();
+      mainWindow.hide();
+    }
+  });
   mainWindow.on('closed', () => { mainWindow = null; });
+}
+
+function showMainWindow() {
+  if (mainWindow && !mainWindow.isDestroyed()) {
+    if (mainWindow.isMinimized()) mainWindow.restore();
+    mainWindow.show();
+    mainWindow.focus();
+  }
+}
+
+function createTray() {
+  try {
+    const icon = nativeImage.createFromPath(path.join(appRoot(), 'assets', 'icon.png'));
+    tray = new Tray(icon.resize({ width: 16, height: 16 }));
+    tray.setToolTip('黑金小鲸鱼');
+    tray.setContextMenu(Menu.buildFromTemplate([
+      { label: '打开 黑金小鲸鱼', click: () => showMainWindow() },
+      { type: 'separator' },
+      { label: '退出', click: () => { isQuitting = true; app.quit(); } },
+    ]));
+    tray.on('click', () => showMainWindow());
+  } catch (e) {
+    console.log('[goldfish] tray init failed:', e.message);
+  }
 }
 
 app.whenReady().then(async () => {
@@ -204,6 +239,7 @@ app.whenReady().then(async () => {
 
   // ---- 立即显示 splash 加载窗口(1 秒内反馈) ----
   createWindow(path.join(appRoot(), 'splash.html'));
+  createTray();
 
   serverPort = await pickPort();
   if (serverPort === null) {
@@ -226,7 +262,9 @@ app.whenReady().then(async () => {
   }
 });
 
-app.on('window-all-closed', () => app.quit());
+app.on('window-all-closed', () => {
+  // 驻留托盘:窗口全关不退出,dsh 服务保持运行(点击秒开)
+});
 app.on('before-quit', () => {
   if (dshProcess) {
     try { dshProcess.kill(); } catch {}
