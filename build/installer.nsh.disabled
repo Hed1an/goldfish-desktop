@@ -1,5 +1,6 @@
-; DeepSeek Harness Desktop — 安装器自定义
-; 在"选择安装目录"之后插入一页:可选择是否创建桌面快捷方式
+; DeepSeek Harness Desktop - custom installer page
+; Adds a "Create desktop shortcut" checkbox after the directory page.
+!echo "GF_CUSTOM_INCLUDE_LOADED"
 !include "nsDialogs.nsh"
 
 Var /GLOBAL gfShortcutCheckbox
@@ -10,14 +11,17 @@ Var /GLOBAL gfShortcutChoice
 !macroend
 
 Function gfShortcutPageCreate
-  !insertmacro MUI_HEADER_TEXT "快捷方式选项" "选择要创建的快捷方式"
   nsDialogs::Create 1018
   Pop $0
-  ${NSD_CreateCheckbox} 0 12u 100% 16u "创建桌面快捷方式(&D)"
+  ${NSD_CreateLabel} 0 8u 100% 22u "Shortcut options"
+  Pop $0
+  SetCtlColors $0 0xE9E6DF 0xFFFFFF
+  ${NSD_CreateCheckbox} 0 34u 100% 16u "Create a desktop shortcut (&D)"
   Pop $gfShortcutCheckbox
   ${NSD_Check} $gfShortcutCheckbox
-  ${NSD_CreateLabel} 0 36u 100% 32u "取消勾选则不创建桌面快捷方式$(;)。开始菜单快捷方式始终创建。"
+  ${NSD_CreateLabel} 0 56u 100% 36u "Uncheck to skip the desktop shortcut. The Start Menu shortcut is always created."
   Pop $0
+  SetCtlColors $0 0x9A978F 0xFFFFFF
   nsDialogs::Show
 FunctionEnd
 
@@ -27,7 +31,7 @@ Function gfShortcutPageLeave
 FunctionEnd
 
 !macro customInstall
-  ; 用户取消勾选:删除刚创建的桌面快捷方式
+  ; User unchecked: remove the desktop shortcut created by the default flow
   ${If} $gfShortcutChoice == 0
     Delete "$newDesktopLink"
   ${EndIf}

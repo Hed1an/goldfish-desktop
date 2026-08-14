@@ -13,6 +13,10 @@ let mainWindow = null;
 let dshProcess = null;
 let serverPort = null;
 
+// ---- 无头检查更新模式:--check-update ----
+// 由计划任务每天 8:00 / 20:00 调用;发现新版则静默下载安装后退出
+const HEADLESS_CHECK = process.argv.includes('--check-update');
+
 // ---- 主题持久化(userData/themes.json,不受端口变化影响) ----
 function themeFile() {
   return path.join(app.getPath('userData'), 'themes.json');
@@ -132,6 +136,64 @@ function createWindow(url) {
 }
 
 app.whenReady().then(async () => {
+  // ---- 自动更新(electron-updater,仅打包版) ----
+  if (app.isPackaged) {
+    const { autoUpdater } = require('electron-updater');
+    autoUpdater.autoDownload = true;
+    autoUpdater.autoInstallOnAppQuit = true;
+
+    autoUpdater.on('checking-for-update', () => console.log('[goldfish] checking for update...'));
+    autoUpdater.on('update-available', (info) => console.log('[goldfish] update available:', info.version));
+    autoUpdater.on('update-not-available', () => {
+      console.log('[goldfish] already latest');
+      if (HEADLESS_CHECK) app.exit(0);
+    });
+    autoUpdater.on('download-progress', (p) => {
+      if (HEADLESS_CHECK || (p.percent % 25 < 1)) console.log(`[goldfish] download ${Math.round(p.percent)}%`);
+    });
+    autoUpdater.on('update-downloaded', (info) => {
+      console.log('[goldfish] update downloaded:', info.version);
+      if (HEADLESS_CHECK) {
+        // 计划任务模式:静默安装后退出
+        setImmediate(() => autoUpdater.quitAndInstall(false, true));
+      } else if (mainWindow && !mainWindow.isDestroyed()) {
+        dialog.showMessageBox(mainWindow, {
+          type: 'info',
+          title: '发现新版本',
+          message: `新版本 ${info.version} 已下载完成`,
+          detail: '点击"重启更新"立即安装,或下次退出应用时自动安装。',
+          buttons: ['重启更新', '稍后'],
+          defaultId: 0,
+        }).then((r) => {
+          if (r.response === 0) autoUpdater.quitAndInstall(false, true);
+        }).catch(() => {});
+      }
+    });
+    autoUpdater.on('error', (err) => {
+      console.log('[goldfish] updater error:', err.message);
+      if (HEADLESS_CHECK) app.exit(1);
+    });
+
+    const checkNow = () => {
+      try { autoUpdater.checkForUpdates().catch((e) => console.log('[goldfish] check failed:', e.message)); }
+      catch (e) { console.log('[goldfish] check failed:', e.message); }
+    };
+
+    if (HEADLESS_CHECK) {
+      // 无头模式:检查 → 下载 → 静默安装;总超时 15 分钟兜底
+      setTimeout(checkNow, 3000);
+      setTimeout(() => app.exit(0), 15 * 60 * 1000);
+      return;
+    }
+
+    // 常规模式:启动 30 秒后检查一次 + 每天 8:00 / 20:00 准点检查
+    setTimeout(checkNow, 30 * 1000);
+    setInterval(() => {
+      const h = new Date().getHours();
+      if (h === 8 || h === 20) checkNow();
+    }, 60 * 1000);
+  }
+
   serverPort = await pickPort();
   if (serverPort === null) {
     dialog.showErrorBox('启动失败', '找不到可用端口(3080-3089 均被占用)');
