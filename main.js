@@ -241,6 +241,13 @@ app.whenReady().then(async () => {
   createWindow(path.join(appRoot(), 'splash.html'));
   createTray();
 
+  // ---- 开机自启(注册 Run 键,--hidden 托盘静默运行)→ 开机后点击即秒开 ----
+  if (app.isPackaged && !HEADLESS_CHECK) {
+    try {
+      app.setLoginItemSettings({ openAtLogin: true, args: ['--hidden'] });
+    } catch (e) { console.log('[goldfish] autostart register failed:', e.message); }
+  }
+
   serverPort = await pickPort();
   if (serverPort === null) {
     dialog.showErrorBox('启动失败', '找不到可用端口(3080-3089 均被占用)');
