@@ -43,7 +43,6 @@
     "asar": false,
     "files": [
       "main.js",
-      "preload.js",
       "theme/**",
       "assets/**",
       "node-runtime/**",

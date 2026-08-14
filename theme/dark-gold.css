@@ -1,8 +1,17 @@
-/* DeepSeek Harness Desktop — 主题 v3(全局一体化)
-   所有颜色走 CSS 变量(theme/panel.js 可切换),无硬编码色,默认值即黑金 */
+/* DeepSeek Harness Desktop — 样式增强
+   圆角(通用)+ 黑金配色(仅深色模式 body[data-ds-dark-theme],跟随 dsh 原始深浅色)
+   浅色模式完全回归 dsh 原始,不做任何颜色覆盖 */
 
+/* 圆角变量(通用,不分深浅色) */
 :root {
-  /* 颜色(默认黑金) */
+  --dsh-radius: 14px;
+  --dsh-radius-sm: 10px;
+  --dsh-radius-xs: 8px;
+  --dsh-radius-pill: 999px;
+}
+
+/* 深色黑金配色变量(仅 dsh 深色模式;浅色时这些变量未定义 → 颜色声明失效,回归原始) */
+body[data-ds-dark-theme] {
   --dsh-bg: #0b0b0f;
   --dsh-bg-soft: #141419;
   --dsh-bg-card: #16161d;
@@ -14,92 +23,51 @@
   --dsh-accent-rgb: 212, 175, 55;
   --dsh-text: #e9e6df;
   --dsh-text-dim: #9a978f;
-
-  /* 圆角 */
-  --dsh-radius: 14px;
-  --dsh-radius-sm: 10px;
-  --dsh-radius-xs: 8px;
-  --dsh-radius-pill: 999px;
-
-  /* 自定义背景图(panel.js 设置) */
-  --dsh-bg-image: none;
-  --dsh-bg-overlay: rgba(5, 5, 8, 0.72);
 }
 
-html {
-  color-scheme: dark !important;
-}
-
-html, body {
+/* ---- 深色背景 ---- */
+body[data-ds-dark-theme] {
   background-color: var(--dsh-bg) !important;
 }
 
-/* 自定义背景图 + 暗色遮罩 */
-body {
-  background-image: var(--dsh-bg-image) !important;
-  background-size: cover !important;
-  background-position: center !important;
-  background-attachment: fixed !important;
-}
-body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  background: var(--dsh-bg-overlay);
-  pointer-events: none;
-  z-index: 0;
-}
-
-body, #app, .app, main, .main, [class*="layout"], [class*="shell"] {
-  background-color: transparent !important;
-  color: var(--dsh-text) !important;
-}
-
-/* ---- 侧边栏 / 面板 ---- */
+/* ---- 侧边栏 / 面板:圆角(通用)+ 黑金配色(深色) ---- */
 [class*="sidebar"], [class*="Sidebar"], [class*="panel"], [class*="Panel"],
 [class*="aside"], [class*="rail"], aside {
+  border-radius: var(--dsh-radius) !important;
   background-color: var(--dsh-bg-soft) !important;
   border-color: var(--dsh-border) !important;
-  border-radius: var(--dsh-radius) !important;
 }
 
 /* ---- 卡片 / 会话列表项 ---- */
 [class*="card"], [class*="Card"], [class*="item"], [class*="Item"],
 [class*="row"], [class*="conversation"] {
+  border-radius: var(--dsh-radius) !important;
   background-color: var(--dsh-bg-card) !important;
   border-color: var(--dsh-border) !important;
-  border-radius: var(--dsh-radius) !important;
   transition: background-color 0.18s ease, border-color 0.18s ease, transform 0.12s ease !important;
 }
-
 [class*="item"]:hover, [class*="Item"]:hover, [class*="row"]:hover {
   background-color: var(--dsh-bg-hover) !important;
   border-color: var(--dsh-accent-soft) !important;
   transform: translateY(-1px) !important;
 }
 
-/* ---- 文字层级 ---- */
-[class*="title"], [class*="Title"], h1, h2, h3, h4 {
-  color: var(--dsh-text) !important;
-}
+/* ---- 文字层级(深色) ---- */
+[class*="title"], [class*="Title"], h1, h2, h3, h4 { color: var(--dsh-text) !important; }
 [class*="secondary"], [class*="muted"], [class*="Muted"], [class*="hint"],
-[class*="timestamp"], [class*="time"] {
-  color: var(--dsh-text-dim) !important;
-}
+[class*="timestamp"], [class*="time"] { color: var(--dsh-text-dim) !important; }
 
-/* ---- 链接 / 交互色 → 主题强调色 ---- */
+/* ---- 链接 / 交互色(深色) ---- */
 a, [class*="link"], [class*="Link"], [class*="accent"], [class*="Accent"],
-[class*="primary"], [class*="active"] {
-  color: var(--dsh-accent-bright) !important;
-}
+[class*="primary"], [class*="active"] { color: var(--dsh-accent-bright) !important; }
 
-/* ---- 按钮 ---- */
+/* ---- 按钮:圆角 + 悬停动效(通用),配色(深色) ---- */
 button {
+  border-radius: var(--dsh-radius-sm) !important;
+  transition: all 0.18s ease !important;
   border-color: var(--dsh-border) !important;
   background-color: var(--dsh-bg-hover) !important;
   color: var(--dsh-text) !important;
-  border-radius: var(--dsh-radius-sm) !important;
-  transition: all 0.18s ease !important;
 }
 button:hover {
   border-color: var(--dsh-accent-soft) !important;
@@ -121,11 +89,11 @@ button[class*="primary"]:hover {
 
 /* ---- 输入框 ---- */
 input, textarea, select, [contenteditable="true"] {
+  border-radius: var(--dsh-radius-sm) !important;
+  transition: border-color 0.18s ease, box-shadow 0.18s ease !important;
   background-color: var(--dsh-bg-soft) !important;
   border-color: var(--dsh-border) !important;
   color: var(--dsh-text) !important;
-  border-radius: var(--dsh-radius-sm) !important;
-  transition: border-color 0.18s ease, box-shadow 0.18s ease !important;
 }
 input:focus, textarea:focus, [contenteditable="true"]:focus {
   border-color: var(--dsh-accent-soft) !important;
@@ -133,15 +101,15 @@ input:focus, textarea:focus, [contenteditable="true"]:focus {
   box-shadow: 0 0 0 3px rgba(var(--dsh-accent-rgb), 0.15) !important;
 }
 
-/* ---- 消息气泡 ---- */
+/* ---- 消息气泡:大圆角 ---- */
 [class*="message"], [class*="Message"], [class*="bubble"], [class*="Bubble"],
 [class*="assistant"], [class*="Assistant"], [class*="user"], [class*="User"] {
+  border-radius: var(--dsh-radius) !important;
   background-color: var(--dsh-bg-card) !important;
   border-color: var(--dsh-border) !important;
-  border-radius: var(--dsh-radius) !important;
 }
 
-/* ---- 滚动条 ---- */
+/* ---- 滚动条(深色) ---- */
 ::-webkit-scrollbar { width: 10px; height: 10px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb {
@@ -152,36 +120,35 @@ input:focus, textarea:focus, [contenteditable="true"]:focus {
 }
 ::-webkit-scrollbar-thumb:hover { background: var(--dsh-accent-soft); background-clip: padding-box; }
 
-/* ---- 选中文本 ---- */
+/* ---- 选中文本(深色) ---- */
 ::selection { background: rgba(var(--dsh-accent-rgb), 0.35); color: #fff; }
 
-/* ---- 代码块 ---- */
+/* ---- 代码块(深色) ---- */
 pre, code, [class*="code"] {
+  border-radius: var(--dsh-radius-sm) !important;
   background-color: var(--dsh-bg-soft) !important;
   border-color: var(--dsh-border) !important;
   color: var(--dsh-accent-bright) !important;
-  border-radius: var(--dsh-radius-sm) !important;
 }
 
-/* ---- 弹窗 / 浮层 ---- */
+/* ---- 弹窗 / 浮层:大圆角 ---- */
 [class*="modal"], [class*="Modal"], [class*="dialog"], [class*="Dialog"],
 [class*="popover"], [class*="menu"] {
+  border-radius: var(--dsh-radius) !important;
   background-color: var(--dsh-bg-card) !important;
   border-color: var(--dsh-border) !important;
-  border-radius: var(--dsh-radius) !important;
   box-shadow: 0 12px 48px rgba(0, 0, 0, 0.5) !important;
 }
 
+/* ---- 占位符(深色) ---- */
 ::placeholder { color: var(--dsh-text-dim) !important; }
 
-/* ---- 全局图标 / Logo 颜色跟随主题 ---- */
+/* ---- 图标 / Logo 颜色跟随深色主题文字色 ---- */
 [class*="sidebar"], [class*="Sidebar"], aside,
 [class*="header"], [class*="Header"],
 [class*="topbar"], [class*="Topbar"],
 [class*="nav"], [class*="Nav"],
-[class*="rail"], [class*="Rail"] {
-  color: var(--dsh-text) !important;
-}
+[class*="rail"], [class*="Rail"] { color: var(--dsh-text) !important; }
 [class*="sidebar"] svg, [class*="Sidebar"] svg, aside svg,
 [class*="header"] svg, [class*="Header"] svg,
 [class*="logo"] *, [class*="Logo"] *,
@@ -197,6 +164,3 @@ svg[aria-hidden="true"] {
   stroke: currentColor !important;
 }
 a svg, [class*="link"] svg { fill: currentColor !important; }
-
-/* ---- 表单控件在浅色系统下保持深色主题 ---- */
-input, select, textarea, button, [role="button"] { color-scheme: dark; }
