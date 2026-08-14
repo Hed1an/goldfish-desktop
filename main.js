@@ -11,6 +11,7 @@ const PORT_TRIES = 10;
 
 let mainWindow = null;
 let dshProcess = null;
+let dshExited = false;
 let tray = null;
 let isQuitting = false;
 
@@ -67,6 +68,8 @@ function waitUp(port, tries) {
   return new Promise((resolve) => {
     let n = 0;
     const t = setInterval(() => {
+      // dsh 子进程崩溃 → 立即判定失败,不空等超时
+      if (dshExited) { clearInterval(t); resolve(false); return; }
       const req = http.get(`http://127.0.0.1:${port}/`, (r) => { clearInterval(t); resolve(true); r.resume(); });
       req.on('error', () => { if (++n >= tries) { clearInterval(t); resolve(false); } });
     }, 800);
@@ -85,18 +88,43 @@ function startDsh(port) {
     dialog.showErrorBox('启动失败', `未找到内置 Node 运行时:\n${nodeExe}`);
     return null;
   }
+  dshExited = false;
+  // dsh 错误输出写入日志文件,便于诊断(不再静默丢弃)
+  let logFd = null;
+  try { logFd = fs.openSync(path.join(app.getPath('userData'), 'dsh-error.log'), 'a'); } catch {}
   const child = spawn(nodeExe, ['--expose-internals', binJs, 'web', '--port', String(port)], {
     env: {
       ...process.env,
       DSH_HOME: path.join(app.getPath('userData'), 'dsh-home'),
     },
-    stdio: 'ignore',
+    stdio: ['ignore', logFd ?? 'ignore', logFd ?? 'ignore'],
     windowsHide: true,
   });
   child.on('exit', (code) => {
+    dshExited = true;
     console.log('[goldfish] dsh exited', code);
+    if (logFd) { try { fs.closeSync(logFd); } catch {} }
   });
   return child;
+}
+
+// 启动 dsh 服务并等待就绪;崩溃/超时自动重试,最多 3 次
+async function startServer() {
+  for (let attempt = 1; attempt <= 3; attempt++) {
+    const port = await pickPort();
+    if (port === null) {
+      dialog.showErrorBox('启动失败', '找不到可用端口(3081-3090 均被占用)');
+      return null;
+    }
+    dshProcess = startDsh(port);
+    if (!dshProcess) return null;
+    const up = await waitUp(port, 300);
+    if (up) return port;
+    console.log(`[goldfish] 启动尝试 ${attempt} 失败,清理后重试...`);
+    if (dshProcess) { try { dshProcess.kill(); } catch {} dshProcess = null; }
+    await new Promise((r) => setTimeout(r, 1200));
+  }
+  return null;
 }
 
 function createWindow(page) {
@@ -244,17 +272,8 @@ app.whenReady().then(async () => {
     } catch (e) { console.log('[goldfish] autostart register failed:', e.message); }
   }
 
-  const serverPort = await pickPort();
+  const serverPort = await startServer();
   if (serverPort === null) {
-    dialog.showErrorBox('启动失败', '找不到可用端口(3081-3090 均被占用)');
-    app.quit();
-    return;
-  }
-  dshProcess = startDsh(serverPort);
-  if (!dshProcess) { app.quit(); return; }
-
-  const up = await waitUp(serverPort, 300);
-  if (!up) {
     dialog.showErrorBox('启动失败', 'DeepSeek Harness 服务未能就绪,请重试');
     app.quit();
     return;
