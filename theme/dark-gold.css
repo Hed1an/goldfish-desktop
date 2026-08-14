@@ -1,8 +1,8 @@
 /* DeepSeek Harness Desktop — 样式增强
-   圆角(通用)+ 黑金配色(仅深色模式 body[data-ds-dark-theme],跟随 dsh 原始深浅色)
-   浅色模式完全回归 dsh 原始,不做任何颜色覆盖 */
+   圆角(通用,不分深浅色)
+   黑金配色:所有颜色规则限定在 body[data-ds-dark-theme] 内
+   → 深色模式黑金生效;浅色模式选择器不匹配,完全不干预 dsh 原始(修复浅色菜单穿模) */
 
-/* 圆角变量(通用,不分深浅色) */
 :root {
   --dsh-radius: 14px;
   --dsh-radius-sm: 10px;
@@ -10,7 +10,33 @@
   --dsh-radius-pill: 999px;
 }
 
-/* 深色黑金配色变量(仅 dsh 深色模式;浅色时这些变量未定义 → 颜色声明失效,回归原始) */
+/* ============ 圆角(通用,无颜色) ============ */
+[class*="sidebar"], [class*="Sidebar"], [class*="panel"], [class*="Panel"],
+[class*="aside"], [class*="rail"], aside {
+  border-radius: var(--dsh-radius) !important;
+}
+[class*="card"], [class*="Card"], [class*="item"], [class*="Item"],
+[class*="row"], [class*="conversation"] {
+  border-radius: var(--dsh-radius) !important;
+}
+[class*="message"], [class*="Message"], [class*="bubble"], [class*="Bubble"],
+[class*="assistant"], [class*="Assistant"], [class*="user"], [class*="User"] {
+  border-radius: var(--dsh-radius) !important;
+}
+button { border-radius: var(--dsh-radius-sm) !important; }
+button[class*="primary"] { border-radius: var(--dsh-radius-pill) !important; }
+input, textarea, select, [contenteditable="true"] { border-radius: var(--dsh-radius-sm) !important; }
+[class*="modal"], [class*="Modal"], [class*="dialog"], [class*="Dialog"],
+[class*="popover"], [class*="menu"] { border-radius: var(--dsh-radius) !important; }
+pre, code, [class*="code"] { border-radius: var(--dsh-radius-sm) !important; }
+::-webkit-scrollbar-thumb { border-radius: var(--dsh-radius-pill) !important; }
+
+/* 动效(通用) */
+[class*="item"]:hover, [class*="Item"]:hover, [class*="row"]:hover { transform: translateY(-1px) !important; }
+button:hover { transform: translateY(-1px) !important; }
+button:active { transform: scale(0.97) !important; }
+
+/* ============ 黑金配色(仅深色模式) ============ */
 body[data-ds-dark-theme] {
   --dsh-bg: #0b0b0f;
   --dsh-bg-soft: #141419;
@@ -25,142 +51,107 @@ body[data-ds-dark-theme] {
   --dsh-text-dim: #9a978f;
 }
 
-/* ---- 深色背景 ---- */
-body[data-ds-dark-theme] {
-  background-color: var(--dsh-bg) !important;
-}
+body[data-ds-dark-theme] { background-color: var(--dsh-bg) !important; }
 
-/* ---- 侧边栏 / 面板:圆角(通用)+ 黑金配色(深色) ---- */
-[class*="sidebar"], [class*="Sidebar"], [class*="panel"], [class*="Panel"],
-[class*="aside"], [class*="rail"], aside {
-  border-radius: var(--dsh-radius) !important;
+body[data-ds-dark-theme] [class*="sidebar"], body[data-ds-dark-theme] [class*="Sidebar"],
+body[data-ds-dark-theme] [class*="panel"], body[data-ds-dark-theme] [class*="Panel"],
+body[data-ds-dark-theme] [class*="aside"], body[data-ds-dark-theme] [class*="rail"],
+body[data-ds-dark-theme] aside {
   background-color: var(--dsh-bg-soft) !important;
   border-color: var(--dsh-border) !important;
 }
-
-/* ---- 卡片 / 会话列表项 ---- */
-[class*="card"], [class*="Card"], [class*="item"], [class*="Item"],
-[class*="row"], [class*="conversation"] {
-  border-radius: var(--dsh-radius) !important;
+body[data-ds-dark-theme] [class*="card"], body[data-ds-dark-theme] [class*="Card"],
+body[data-ds-dark-theme] [class*="item"], body[data-ds-dark-theme] [class*="Item"],
+body[data-ds-dark-theme] [class*="row"], body[data-ds-dark-theme] [class*="conversation"] {
   background-color: var(--dsh-bg-card) !important;
   border-color: var(--dsh-border) !important;
-  transition: background-color 0.18s ease, border-color 0.18s ease, transform 0.12s ease !important;
+  transition: background-color 0.18s ease, border-color 0.18s ease !important;
 }
-[class*="item"]:hover, [class*="Item"]:hover, [class*="row"]:hover {
+body[data-ds-dark-theme] [class*="item"]:hover, body[data-ds-dark-theme] [class*="Item"]:hover,
+body[data-ds-dark-theme] [class*="row"]:hover {
   background-color: var(--dsh-bg-hover) !important;
   border-color: var(--dsh-accent-soft) !important;
-  transform: translateY(-1px) !important;
 }
-
-/* ---- 文字层级(深色) ---- */
-[class*="title"], [class*="Title"], h1, h2, h3, h4 { color: var(--dsh-text) !important; }
-[class*="secondary"], [class*="muted"], [class*="Muted"], [class*="hint"],
-[class*="timestamp"], [class*="time"] { color: var(--dsh-text-dim) !important; }
-
-/* ---- 链接 / 交互色(深色) ---- */
-a, [class*="link"], [class*="Link"], [class*="accent"], [class*="Accent"],
-[class*="primary"], [class*="active"] { color: var(--dsh-accent-bright) !important; }
-
-/* ---- 按钮:圆角 + 悬停动效(通用),配色(深色) ---- */
-button {
-  border-radius: var(--dsh-radius-sm) !important;
-  transition: all 0.18s ease !important;
-  border-color: var(--dsh-border) !important;
-  background-color: var(--dsh-bg-hover) !important;
+body[data-ds-dark-theme] [class*="title"], body[data-ds-dark-theme] [class*="Title"],
+body[data-ds-dark-theme] h1, body[data-ds-dark-theme] h2, body[data-ds-dark-theme] h3, body[data-ds-dark-theme] h4 {
   color: var(--dsh-text) !important;
 }
-button:hover {
+body[data-ds-dark-theme] [class*="secondary"], body[data-ds-dark-theme] [class*="muted"],
+body[data-ds-dark-theme] [class*="Muted"], body[data-ds-dark-theme] [class*="hint"],
+body[data-ds-dark-theme] [class*="timestamp"], body[data-ds-dark-theme] [class*="time"] {
+  color: var(--dsh-text-dim) !important;
+}
+body[data-ds-dark-theme] a, body[data-ds-dark-theme] [class*="link"], body[data-ds-dark-theme] [class*="Link"],
+body[data-ds-dark-theme] [class*="accent"], body[data-ds-dark-theme] [class*="Accent"],
+body[data-ds-dark-theme] [class*="primary"], body[data-ds-dark-theme] [class*="active"] {
+  color: var(--dsh-accent-bright) !important;
+}
+body[data-ds-dark-theme] button {
+  background-color: var(--dsh-bg-hover) !important;
+  border-color: var(--dsh-border) !important;
+  color: var(--dsh-text) !important;
+}
+body[data-ds-dark-theme] button:hover {
   border-color: var(--dsh-accent-soft) !important;
   color: var(--dsh-accent-bright) !important;
-  transform: translateY(-1px) !important;
 }
-button:active { transform: scale(0.97) !important; }
-button[class*="primary"] {
+body[data-ds-dark-theme] button[class*="primary"] {
   background-color: var(--dsh-accent-soft) !important;
   border-color: var(--dsh-accent) !important;
   color: var(--dsh-bg) !important;
-  border-radius: var(--dsh-radius-pill) !important;
   box-shadow: 0 2px 14px rgba(var(--dsh-accent-rgb), 0.25) !important;
 }
-button[class*="primary"]:hover {
+body[data-ds-dark-theme] button[class*="primary"]:hover {
   background-color: var(--dsh-accent) !important;
   box-shadow: 0 4px 20px rgba(var(--dsh-accent-rgb), 0.4) !important;
 }
-
-/* ---- 输入框 ---- */
-input, textarea, select, [contenteditable="true"] {
-  border-radius: var(--dsh-radius-sm) !important;
-  transition: border-color 0.18s ease, box-shadow 0.18s ease !important;
+body[data-ds-dark-theme] input, body[data-ds-dark-theme] textarea,
+body[data-ds-dark-theme] select, body[data-ds-dark-theme] [contenteditable="true"] {
   background-color: var(--dsh-bg-soft) !important;
   border-color: var(--dsh-border) !important;
   color: var(--dsh-text) !important;
 }
-input:focus, textarea:focus, [contenteditable="true"]:focus {
+body[data-ds-dark-theme] input:focus, body[data-ds-dark-theme] textarea:focus,
+body[data-ds-dark-theme] [contenteditable="true"]:focus {
   border-color: var(--dsh-accent-soft) !important;
   outline-color: var(--dsh-accent-soft) !important;
   box-shadow: 0 0 0 3px rgba(var(--dsh-accent-rgb), 0.15) !important;
 }
-
-/* ---- 消息气泡:大圆角 ---- */
-[class*="message"], [class*="Message"], [class*="bubble"], [class*="Bubble"],
-[class*="assistant"], [class*="Assistant"], [class*="user"], [class*="User"] {
-  border-radius: var(--dsh-radius) !important;
+body[data-ds-dark-theme] [class*="message"], body[data-ds-dark-theme] [class*="Message"],
+body[data-ds-dark-theme] [class*="bubble"], body[data-ds-dark-theme] [class*="Bubble"],
+body[data-ds-dark-theme] [class*="assistant"], body[data-ds-dark-theme] [class*="Assistant"],
+body[data-ds-dark-theme] [class*="user"], body[data-ds-dark-theme] [class*="User"] {
   background-color: var(--dsh-bg-card) !important;
   border-color: var(--dsh-border) !important;
 }
-
-/* ---- 滚动条(深色) ---- */
-::-webkit-scrollbar { width: 10px; height: 10px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb {
-  background: var(--dsh-border);
-  border-radius: var(--dsh-radius-pill);
-  border: 2px solid transparent;
-  background-clip: padding-box;
-}
-::-webkit-scrollbar-thumb:hover { background: var(--dsh-accent-soft); background-clip: padding-box; }
-
-/* ---- 选中文本(深色) ---- */
-::selection { background: rgba(var(--dsh-accent-rgb), 0.35); color: #fff; }
-
-/* ---- 代码块(深色) ---- */
-pre, code, [class*="code"] {
-  border-radius: var(--dsh-radius-sm) !important;
-  background-color: var(--dsh-bg-soft) !important;
-  border-color: var(--dsh-border) !important;
-  color: var(--dsh-accent-bright) !important;
-}
-
-/* ---- 弹窗 / 浮层:大圆角 ---- */
-[class*="modal"], [class*="Modal"], [class*="dialog"], [class*="Dialog"],
-[class*="popover"], [class*="menu"] {
-  border-radius: var(--dsh-radius) !important;
+body[data-ds-dark-theme] [class*="modal"], body[data-ds-dark-theme] [class*="Modal"],
+body[data-ds-dark-theme] [class*="dialog"], body[data-ds-dark-theme] [class*="Dialog"],
+body[data-ds-dark-theme] [class*="popover"], body[data-ds-dark-theme] [class*="menu"] {
   background-color: var(--dsh-bg-card) !important;
   border-color: var(--dsh-border) !important;
   box-shadow: 0 12px 48px rgba(0, 0, 0, 0.5) !important;
 }
+body[data-ds-dark-theme] pre, body[data-ds-dark-theme] code, body[data-ds-dark-theme] [class*="code"] {
+  background-color: var(--dsh-bg-soft) !important;
+  border-color: var(--dsh-border) !important;
+  color: var(--dsh-accent-bright) !important;
+}
+body[data-ds-dark-theme] ::placeholder { color: var(--dsh-text-dim) !important; }
+body[data-ds-dark-theme] ::selection { background: rgba(var(--dsh-accent-rgb), 0.35) !important; color: #fff; }
+body[data-ds-dark-theme] ::-webkit-scrollbar-thumb { background: var(--dsh-border) !important; }
+body[data-ds-dark-theme] ::-webkit-scrollbar-thumb:hover { background: var(--dsh-accent-soft) !important; }
 
-/* ---- 占位符(深色) ---- */
-::placeholder { color: var(--dsh-text-dim) !important; }
-
-/* ---- 图标 / Logo 颜色跟随深色主题文字色 ---- */
-[class*="sidebar"], [class*="Sidebar"], aside,
-[class*="header"], [class*="Header"],
-[class*="topbar"], [class*="Topbar"],
-[class*="nav"], [class*="Nav"],
-[class*="rail"], [class*="Rail"] { color: var(--dsh-text) !important; }
-[class*="sidebar"] svg, [class*="Sidebar"] svg, aside svg,
-[class*="header"] svg, [class*="Header"] svg,
-[class*="logo"] *, [class*="Logo"] *,
-svg[aria-hidden="true"] {
+/* 图标 / Logo(深色) */
+body[data-ds-dark-theme] [class*="sidebar"], body[data-ds-dark-theme] [class*="Sidebar"],
+body[data-ds-dark-theme] aside, body[data-ds-dark-theme] [class*="header"],
+body[data-ds-dark-theme] [class*="Header"], body[data-ds-dark-theme] [class*="topbar"],
+body[data-ds-dark-theme] [class*="nav"], body[data-ds-dark-theme] [class*="rail"] {
+  color: var(--dsh-text) !important;
+}
+body[data-ds-dark-theme] [class*="sidebar"] svg, body[data-ds-dark-theme] [class*="Sidebar"] svg,
+body[data-ds-dark-theme] aside svg, body[data-ds-dark-theme] [class*="header"] svg,
+body[data-ds-dark-theme] [class*="logo"] *, body[data-ds-dark-theme] svg[aria-hidden="true"] {
   color: var(--dsh-text) !important;
   fill: currentColor !important;
   stroke: currentColor !important;
 }
-[class*="icon"], [class*="Icon"] { color: inherit !important; }
-[class*="icon"] svg, [class*="Icon"] svg {
-  color: inherit !important;
-  fill: currentColor !important;
-  stroke: currentColor !important;
-}
-a svg, [class*="link"] svg { fill: currentColor !important; }
