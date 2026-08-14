@@ -135,10 +135,6 @@ function createWindow(page) {
     if (fs.existsSync(panel)) {
       mainWindow.webContents.executeJavaScript(fs.readFileSync(panel, 'utf8')).catch(() => {});
     }
-    const token = path.join(appRoot(), 'theme', 'token.js');
-    if (fs.existsSync(token)) {
-      mainWindow.webContents.executeJavaScript(fs.readFileSync(token, 'utf8')).catch(() => {});
-    }
   });
 
   mainWindow.webContents.setWindowOpenHandler(() => ({ action: 'deny' }));
