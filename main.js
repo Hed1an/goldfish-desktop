@@ -123,7 +123,7 @@ function createWindow(page) {
     minWidth: 1024,
     minHeight: 700,
     backgroundColor: '#0b0b0f',
-    title: '黑金小鲸鱼',
+    title: 'DeepSeek Harness Desktop',
     autoHideMenuBar: true,
     show: false,
     icon: path.join(appRoot(), 'assets', 'icon.png'),
@@ -174,9 +174,9 @@ function createTray() {
   try {
     const icon = nativeImage.createFromPath(path.join(appRoot(), 'assets', 'icon.png'));
     tray = new Tray(icon.resize({ width: 16, height: 16 }));
-    tray.setToolTip('黑金小鲸鱼');
+    tray.setToolTip('DeepSeek Harness Desktop');
     tray.setContextMenu(Menu.buildFromTemplate([
-      { label: '打开 黑金小鲸鱼', click: () => showMainWindow() },
+      { label: '打开 DeepSeek Harness Desktop', click: () => showMainWindow() },
       { type: 'separator' },
       { label: '退出', click: () => { isQuitting = true; app.quit(); } },
     ]));

@@ -1,4 +1,4 @@
-# DeepSeek Harness Desktop(黑金小金鱼)
+# DeepSeek Harness Desktop
 
 > DeepSeek Harness 的**桌面端** —— 独立窗口、黑金主题、双击桌面快捷方式即用。
 
