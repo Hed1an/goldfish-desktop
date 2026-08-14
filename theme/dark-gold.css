@@ -178,3 +178,42 @@ pre, code, [class*="code"] {
 
 /* 输入框占位符 */
 ::placeholder { color: var(--dsh-text-dim) !important; }
+
+/* ---- 全局图标 / Logo 颜色跟随主题(修复浅色模式下图标仍是深色) ---- */
+html { color-scheme: dark !important; }
+
+[class*="sidebar"], [class*="Sidebar"], aside,
+[class*="header"], [class*="Header"],
+[class*="topbar"], [class*="Topbar"],
+[class*="nav"], [class*="Nav"],
+[class*="rail"], [class*="Rail"] {
+  color: var(--dsh-text) !important;
+}
+/* Logo 用 currentColor,强制它继承主题文字色 */
+[class*="sidebar"] svg, [class*="Sidebar"] svg, aside svg,
+[class*="header"] svg, [class*="Header"] svg,
+[class*="logo"] *, [class*="Logo"] *,
+svg[aria-hidden="true"] {
+  color: var(--dsh-text) !important;
+  fill: currentColor !important;
+  stroke: currentColor !important;
+}
+/* 通用图标:继承所在文字色(配合上面的 color 继承) */
+[class*="icon"], [class*="Icon"] {
+  color: inherit !important;
+}
+[class*="icon"] svg, [class*="Icon"] svg {
+  color: inherit !important;
+  fill: currentColor !important;
+  stroke: currentColor !important;
+}
+
+/* 表单控件在浅色系统下保持深色主题 */
+input, select, textarea, button, [role="button"] {
+  color-scheme: dark;
+}
+
+/* 链接图标跟随强调色 */
+a svg, [class*="link"] svg {
+  fill: currentColor !important;
+}

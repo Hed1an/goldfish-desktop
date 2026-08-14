@@ -30,6 +30,7 @@ ipcMain.handle('theme:set', (_e, value) => {
 
 // ---- 单实例:再点快捷方式时聚焦已有窗口 ----
 const gotLock = app.requestSingleInstanceLock();
+console.log('[goldfish] gotLock:', gotLock, 'headless:', HEADLESS_CHECK);
 if (!gotLock) {
   app.quit();
 } else {
@@ -101,7 +102,7 @@ function startDsh(port) {
   return child;
 }
 
-function createWindow(url) {
+function createWindow(page) {
   mainWindow = new BrowserWindow({
     width: 1440,
     height: 900,
@@ -110,6 +111,7 @@ function createWindow(url) {
     backgroundColor: '#0b0b0f',
     title: 'DeepSeek Harness',
     autoHideMenuBar: true,
+    show: false,
     icon: path.join(appRoot(), 'assets', 'icon.png'),
     webPreferences: {
       contextIsolation: true,
@@ -119,7 +121,12 @@ function createWindow(url) {
     },
   });
 
+  mainWindow.once('ready-to-show', () => mainWindow.show());
+
   mainWindow.webContents.on('did-finish-load', () => {
+    // 仅在加载真实 UI(http://127.0.0.1)时注入主题与工具;splash 页跳过
+    const url = mainWindow.webContents.getURL();
+    if (!url.startsWith('http://127.0.0.1')) return;
     const css = path.join(appRoot(), 'theme', 'dark-gold.css');
     if (fs.existsSync(css)) {
       mainWindow.webContents.insertCSS(fs.readFileSync(css, 'utf8')).catch(() => {});
@@ -128,10 +135,15 @@ function createWindow(url) {
     if (fs.existsSync(panel)) {
       mainWindow.webContents.executeJavaScript(fs.readFileSync(panel, 'utf8')).catch(() => {});
     }
+    const token = path.join(appRoot(), 'theme', 'token.js');
+    if (fs.existsSync(token)) {
+      mainWindow.webContents.executeJavaScript(fs.readFileSync(token, 'utf8')).catch(() => {});
+    }
   });
 
   mainWindow.webContents.setWindowOpenHandler(() => ({ action: 'deny' }));
-  mainWindow.loadURL(url);
+  if (page.startsWith('http')) mainWindow.loadURL(page);
+  else mainWindow.loadFile(page);
   mainWindow.on('closed', () => { mainWindow = null; });
 }
 
@@ -194,6 +206,9 @@ app.whenReady().then(async () => {
     }, 60 * 1000);
   }
 
+  // ---- 立即显示 splash 加载窗口(1 秒内反馈) ----
+  createWindow(path.join(appRoot(), 'splash.html'));
+
   serverPort = await pickPort();
   if (serverPort === null) {
     dialog.showErrorBox('启动失败', '找不到可用端口(3080-3089 均被占用)');
@@ -203,13 +218,16 @@ app.whenReady().then(async () => {
   dshProcess = startDsh(serverPort);
   if (!dshProcess) { app.quit(); return; }
 
-  const up = await waitUp(serverPort, 90);
+  const up = await waitUp(serverPort, 150);
   if (!up) {
     dialog.showErrorBox('启动失败', 'DeepSeek Harness 服务未能就绪,请重试');
     app.quit();
     return;
   }
-  createWindow(`http://127.0.0.1:${serverPort}`);
+  // 服务就绪 → 切换到真实 UI
+  if (mainWindow && !mainWindow.isDestroyed()) {
+    mainWindow.loadURL(`http://127.0.0.1:${serverPort}`);
+  }
 });
 
 app.on('window-all-closed', () => app.quit());
