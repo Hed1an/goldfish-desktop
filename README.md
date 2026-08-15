@@ -14,24 +14,44 @@
 - 🔄 **自动更新** —— 每天 8:00/20:00 自动检查,发现新版静默升级
 - 🪟 **托盘常驻 + 开机自启** —— 关闭窗口驻留托盘,点击秒开
 
-## 🚀 一键部署
+## 🚀 一键部署(两种形态)
 
-### 最终用户(推荐)
+这个产品提供**两种部署形态**,按需选择其一即可:
+
+### 🖥️ 形态一:桌面版(NSIS 安装包,推荐)
+独立 Electron 原生窗口、黑金主题、托盘常驻、开机自启、自动更新。
 1. 去 **Releases** 下载最新 `DeepSeek-Harness-Desktop-Setup-*.exe`
 2. 双击安装 → 桌面出现 **DeepSeek Harness** 快捷方式
 3. 双击即开。首次使用:设置 → 模型 → 填 DeepSeek API Key → 选工作区
 
 > 无需安装 Node.js / Python / 任何运行时。
 
+### 🟢 形态二:便携版(绿色免安装 zip)
+免安装、解压即用,浏览器 Web UI,数据存包内 `data\`。
+独立仓库:[deepseek-harness-portable](https://github.com/Hed1an/deepseek-harness-portable)
+1. 到便携版仓库 **Releases** 下载 `dsh-portable-*.zip`
+2. 解压到任意目录 → 双击 `启动 DeepSeek Harness.bat`
+3. 浏览器自动打开 → 填 API Key → 开聊
+
+> 想要"原生应用感 + 自动更新"→ 选**桌面版**;想要"绿色免安装、数据随包、U盘带走"→ 选**便携版**。
+
 ### 开发者(从源码构建)
+
+**桌面版**(本仓库):
 ```bash
-# 环境:Node.js ≥ 22 + npm + git
 git clone https://github.com/Hed1an/goldfish-desktop.git
 cd goldfish-desktop
 npm install         # 安装依赖(含 dsh 运行时)
 npm run build       # 一键打包 NSIS 安装包 → dist\ 目录
 ```
 Windows 下也可直接双击根目录的 `build.bat` 一键完成 `install + build`。
+
+**便携版**([deepseek-harness-portable](https://github.com/Hed1an/deepseek-harness-portable)):
+```bash
+git clone https://github.com/Hed1an/deepseek-harness-portable.git
+cd deepseek-harness-portable
+build.bat           # 下载便携 Node → 装 dsh → 打包 zip 到 dist\
+```
 
 ## 🛠 常用命令
 
