@@ -70,7 +70,6 @@ body[data-ds-dark-theme] [class*="row"], body[data-ds-dark-theme] [class*="conve
 body[data-ds-dark-theme] [class*="item"]:hover, body[data-ds-dark-theme] [class*="Item"]:hover,
 body[data-ds-dark-theme] [class*="row"]:hover {
   background-color: var(--dsh-bg-hover) !important;
-  border-color: var(--dsh-accent-soft) !important;
 }
 body[data-ds-dark-theme] [class*="title"], body[data-ds-dark-theme] [class*="Title"],
 body[data-ds-dark-theme] h1, body[data-ds-dark-theme] h2, body[data-ds-dark-theme] h3, body[data-ds-dark-theme] h4 {
@@ -92,7 +91,6 @@ body[data-ds-dark-theme] button {
   color: var(--dsh-text) !important;
 }
 body[data-ds-dark-theme] button:hover {
-  border-color: var(--dsh-accent-soft) !important;
   color: var(--dsh-accent-bright) !important;
 }
 body[data-ds-dark-theme] button[class*="primary"] {
@@ -111,12 +109,7 @@ body[data-ds-dark-theme] select, body[data-ds-dark-theme] [contenteditable="true
   border-color: var(--dsh-border) !important;
   color: var(--dsh-text) !important;
 }
-body[data-ds-dark-theme] input:focus, body[data-ds-dark-theme] textarea:focus,
-body[data-ds-dark-theme] [contenteditable="true"]:focus {
-  border-color: var(--dsh-accent-soft) !important;
-  outline-color: var(--dsh-accent-soft) !important;
-  box-shadow: 0 0 0 3px rgba(var(--dsh-accent-rgb), 0.15) !important;
-}
+/* 输入框 focus 用官方默认,不加金色光环(用户要求) */
 body[data-ds-dark-theme] [class*="message"], body[data-ds-dark-theme] [class*="Message"],
 body[data-ds-dark-theme] [class*="bubble"], body[data-ds-dark-theme] [class*="Bubble"],
 body[data-ds-dark-theme] [class*="assistant"], body[data-ds-dark-theme] [class*="Assistant"],
@@ -137,7 +130,7 @@ body[data-ds-dark-theme] pre, body[data-ds-dark-theme] code, body[data-ds-dark-t
   color: var(--dsh-accent-bright) !important;
 }
 body[data-ds-dark-theme] ::placeholder { color: var(--dsh-text-dim) !important; }
-body[data-ds-dark-theme] ::selection { background: rgba(var(--dsh-accent-rgb), 0.35) !important; color: #fff; }
+/* 文本框选用官方默认高亮,不用金色(用户要求,对话框框选更自然) */
 body[data-ds-dark-theme] ::-webkit-scrollbar-thumb { background: var(--dsh-border) !important; }
 body[data-ds-dark-theme] ::-webkit-scrollbar-thumb:hover { background: var(--dsh-accent-soft) !important; }
 
