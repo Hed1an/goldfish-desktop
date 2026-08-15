@@ -1,7 +1,7 @@
 // DeepSeek Harness Desktop — 主进程
 // 内嵌启动 dsh Web UI(内置 Node 运行时),独立窗口呈现 + 黑金主题
 const { app, BrowserWindow, dialog, Tray, Menu, nativeImage } = require('electron');
-const { spawn } = require('child_process');
+const { spawn, execFileSync } = require('child_process');
 const http = require('http');
 const path = require('path');
 const fs = require('fs');
@@ -81,11 +81,22 @@ function startDsh(port) {
   // dsh 错误输出写入日志文件,便于诊断(不再静默丢弃)
   let logFd = null;
   try { logFd = fs.openSync(path.join(app.getPath('userData'), 'dsh-error.log'), 'a'); } catch {}
+  // MCP 环境变量:从 Windows 用户环境读取(注册表),注入 dsh 子进程。
+  // setx 只写注册表,已运行的桌面进程 env 不会刷新,故在此主动补读,
+  // 让 !!js process.env.<KEY> 在 dsh 里能拿到值(如 GITHUB_TOKEN)。
+  const childEnv = { ...process.env, DSH_HOME: path.join(app.getPath('userData'), 'dsh-home') };
+  for (const key of ['GITHUB_TOKEN', 'TREG_TOKEN']) {
+    if (!childEnv[key]) {
+      try {
+        const val = execFileSync('powershell.exe',
+          ['-NoProfile', '-Command', `[Environment]::GetEnvironmentVariable('${key}','User')`],
+          { encoding: 'utf8', windowsHide: true }).trim();
+        if (val) childEnv[key] = val;
+      } catch {}
+    }
+  }
   const child = spawn(nodeExe, ['--expose-internals', binJs, 'web', '--port', String(port)], {
-    env: {
-      ...process.env,
-      DSH_HOME: path.join(app.getPath('userData'), 'dsh-home'),
-    },
+    env: childEnv,
     stdio: ['ignore', logFd ?? 'ignore', logFd ?? 'ignore'],
     windowsHide: true,
   });
