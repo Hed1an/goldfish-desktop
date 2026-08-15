@@ -114,12 +114,28 @@ function reconcileBundles() {
         added.push(name);
       }
     }
-    if (added.length > 0) {
+    // 剔除 bundles 中实际未安装的残留条目(profile node_modules 与 app 安装的
+    // node_modules 里都没有真实包目录),否则 dsh 启动解析到不存在的 bundle 会直接崩溃
+    // (如 @linxin666/dsh-web-ui-all 空目录)。内置核心 bundle 解析自 app 安装目录,
+    // 故两处都要查,避免误删官方 bundle。
+    const removed = [];
+    for (const name of [...bundles]) {
+      const inProfile = path.join(profileDir, 'node_modules', name);
+      const inApp = path.join(app.getAppPath(), 'node_modules', name);
+      const ok = (fs.existsSync(inProfile) && fs.statSync(inProfile).isDirectory()) ||
+                 (fs.existsSync(inApp) && fs.statSync(inApp).isDirectory());
+      if (!ok) {
+        bundles.delete(name);
+        removed.push(name);
+      }
+    }
+    if (added.length > 0 || removed.length > 0) {
       pkg.dsh = pkg.dsh ?? {};
       pkg.dsh.profile = pkg.dsh.profile ?? {};
       pkg.dsh.profile.bundles = [...bundles];
       fs.writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + '\n');
-      console.log('[goldfish] 自动注册插件到 bundles:', added.join(', '));
+      if (added.length) console.log('[goldfish] 自动注册插件到 bundles:', added.join(', '));
+      if (removed.length) console.log('[goldfish] 剔除未安装的残留 bundle:', removed.join(', '));
     }
   } catch (e) {
     console.log('[goldfish] reconcileBundles error:', e.message);
