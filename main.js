@@ -126,6 +126,20 @@ function reconcileBundles() {
   }
 }
 
+// 自动放行插件构建脚本:pnpm-workspace.yaml 里 allowBuilds 的占位符改成 true
+// (否则 pnpm 默认拦截构建脚本,导致依赖 native 模块的插件不完整、无法运行)
+function allowBuildScripts() {
+  try {
+    const yamlPath = path.join(app.getPath('userData'), 'dsh-home', 'profiles', 'web', 'pnpm-workspace.yaml');
+    if (!fs.existsSync(yamlPath)) return;
+    const s = fs.readFileSync(yamlPath, 'utf8');
+    if (s.includes('set this to true or false')) {
+      fs.writeFileSync(yamlPath, s.replace(/set this to true or false/g, 'true'));
+      console.log('[goldfish] 已自动放行所有插件构建脚本');
+    }
+  } catch (e) {}
+}
+
 // 本地 LLM 服务(Ollama + Control Plane)自动启动 —— 让桌面版具备本地省 token 能力
 let ollamaProcess = null;
 let localLlmProcess = null;
@@ -168,6 +182,7 @@ async function startLocalLLM() {
 
 async function startServer() {
   reconcileBundles();
+  allowBuildScripts();
   for (let attempt = 1; attempt <= 3; attempt++) {
     const port = await pickPort();
     if (port === null) {
@@ -183,6 +198,34 @@ async function startServer() {
     await new Promise((r) => setTimeout(r, 1200));
   }
   return null;
+}
+
+// 插件变更自动检测:装/卸插件后自动 reconcile + 重启 dsh(免手动重启应用)
+async function restartDsh() {
+  console.log('[goldfish] 检测到插件变更,重启 dsh 以加载...');
+  if (dshProcess) { try { dshProcess.kill(); } catch {} dshProcess = null; }
+  const port = await startServer();
+  if (port !== null && mainWindow && !mainWindow.isDestroyed()) {
+    mainWindow.loadURL(`http://127.0.0.1:${port}`);
+  }
+}
+
+function watchProfileChanges() {
+  let lastDepsKey = null;
+  setInterval(async () => {
+    try {
+      const pkgPath = path.join(app.getPath('userData'), 'dsh-home', 'profiles', 'web', 'package.json');
+      const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
+      const depsKey = Object.keys(pkg.dependencies || {}).sort().join(',');
+      if (lastDepsKey !== null && depsKey !== lastDepsKey) {
+        const b1 = JSON.stringify(pkg.dsh?.profile?.bundles || []);
+        reconcileBundles();
+        const p2 = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
+        if (b1 !== JSON.stringify(p2.dsh?.profile?.bundles || [])) await restartDsh();
+      }
+      lastDepsKey = depsKey;
+    } catch (e) {}
+  }, 6000);
 }
 
 function createWindow(page) {
@@ -338,6 +381,9 @@ app.whenReady().then(async () => {
   if (mainWindow && !mainWindow.isDestroyed()) {
     mainWindow.loadURL(`http://127.0.0.1:${serverPort}`);
   }
+
+  // 开始监听插件变更(装/卸插件自动 reconcile + 重启 dsh,免手动重启应用)
+  watchProfileChanges();
 });
 
 app.on('window-all-closed', () => {
