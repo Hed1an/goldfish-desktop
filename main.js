@@ -126,6 +126,46 @@ function reconcileBundles() {
   }
 }
 
+// 本地 LLM 服务(Ollama + Control Plane)自动启动 —— 让桌面版具备本地省 token 能力
+let ollamaProcess = null;
+let localLlmProcess = null;
+
+function isOllamaRunning() {
+  return new Promise((resolve) => {
+    try {
+      const req = http.get('http://127.0.0.1:11434/api/tags', (r) => { r.resume(); resolve(r.statusCode === 200); });
+      req.on('error', () => resolve(false));
+      req.setTimeout(1500, () => { try { req.destroy(); } catch {} resolve(false); });
+    } catch { resolve(false); }
+  });
+}
+
+async function startLocalLLM() {
+  try {
+    // 1) Ollama 本地模型服务(未运行则启动)
+    if (!(await isOllamaRunning())) {
+      const ollamaPath = path.join(process.env.LOCALAPPDATA || '', 'Programs', 'Ollama', 'ollama.exe');
+      if (fs.existsSync(ollamaPath)) {
+        console.log('[goldfish] 启动本地 Ollama...');
+        ollamaProcess = spawn(ollamaPath, ['serve'], { stdio: 'ignore', windowsHide: true });
+        for (let i = 0; i < 20; i++) {
+          await new Promise((r) => setTimeout(r, 1000));
+          if (await isOllamaRunning()) break;
+        }
+      }
+    }
+    // 2) Control Plane 本地 LLM 中介(127.0.0.1:8765)
+    const cpNode = path.join(appRoot(), 'node-runtime', 'node.exe');
+    const cpFile = path.join(appRoot(), 'control-plane.mjs');
+    if (fs.existsSync(cpNode) && fs.existsSync(cpFile)) {
+      console.log('[goldfish] 启动 Control Plane(本地 LLM 8765)...');
+      localLlmProcess = spawn(cpNode, [cpFile], { stdio: 'ignore', windowsHide: true });
+    }
+  } catch (e) {
+    console.log('[goldfish] localLLM start error:', e.message);
+  }
+}
+
 async function startServer() {
   reconcileBundles();
   for (let attempt = 1; attempt <= 3; attempt++) {
@@ -285,6 +325,9 @@ app.whenReady().then(async () => {
     } catch (e) { console.log('[goldfish] autostart register failed:', e.message); }
   }
 
+  // 启动本地 LLM 服务(Ollama + Control Plane),让 dsh 的本地省 token 工具可用
+  await startLocalLLM();
+
   const serverPort = await startServer();
   if (serverPort === null) {
     dialog.showErrorBox('启动失败', 'DeepSeek Harness 服务未能就绪,请重试');
@@ -301,6 +344,8 @@ app.on('window-all-closed', () => {
   // 驻留托盘:窗口全关不退出,dsh 服务保持运行(点击秒开)
 });
 app.on('before-quit', () => {
+  if (localLlmProcess) { try { localLlmProcess.kill(); } catch {} localLlmProcess = null; }
+  if (ollamaProcess) { try { ollamaProcess.kill(); } catch {} ollamaProcess = null; }
   if (dshProcess) {
     try { dshProcess.kill(); } catch {}
     dshProcess = null;

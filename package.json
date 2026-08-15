@@ -1,6 +1,6 @@
 {
   "name": "goldfish-desktop",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "main": "main.js",
   "scripts": {
     "start": "electron .",
@@ -48,7 +48,8 @@
       "assets/**",
       "node-runtime/**",
       "node_modules/**",
-      "splash.html"
+      "splash.html",
+      "control-plane.mjs"
     ],
     "directories": {
       "output": "dist"
