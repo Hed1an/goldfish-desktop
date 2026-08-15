@@ -98,7 +98,36 @@ function startDsh(port) {
 }
 
 // 启动 dsh 服务并等待就绪;崩溃/超时自动重试,最多 3 次
+// 启动前先 reconcile bundles:把 dependencies 里有 bundle patch 的插件自动注册进 bundles
+// (插件市场下载插件后,重启应用即可自动生效,无需手动编辑配置)
+function reconcileBundles() {
+  try {
+    const profileDir = path.join(app.getPath('userData'), 'dsh-home', 'profiles', 'web');
+    const pkgPath = path.join(profileDir, 'package.json');
+    if (!fs.existsSync(pkgPath)) return;
+    const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
+    const bundles = new Set(pkg.dsh?.profile?.bundles ?? []);
+    const added = [];
+    for (const name of Object.keys(pkg.dependencies ?? {})) {
+      if (!bundles.has(name) && fs.existsSync(path.join(profileDir, 'node_modules', name, 'cordis.patch.yml'))) {
+        bundles.add(name);
+        added.push(name);
+      }
+    }
+    if (added.length > 0) {
+      pkg.dsh = pkg.dsh ?? {};
+      pkg.dsh.profile = pkg.dsh.profile ?? {};
+      pkg.dsh.profile.bundles = [...bundles];
+      fs.writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + '\n');
+      console.log('[goldfish] 自动注册插件到 bundles:', added.join(', '));
+    }
+  } catch (e) {
+    console.log('[goldfish] reconcileBundles error:', e.message);
+  }
+}
+
 async function startServer() {
+  reconcileBundles();
   for (let attempt = 1; attempt <= 3; attempt++) {
     const port = await pickPort();
     if (port === null) {
